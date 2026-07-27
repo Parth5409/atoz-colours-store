@@ -1,28 +1,31 @@
-import { Github } from "@medusajs/icons";
-import { Button, Heading } from "@modules/common/components/ui";
 const Hero = () => {
   return (
-    <div className="h-[75vh] w-full border-b border-ui-border-base relative bg-ui-bg-subtle">
-      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center text-center small:p-32 gap-6">
-        <span>
-          <Heading
-            level="h1"
-            className="text-3xl leading-10 text-ui-fg-base font-normal"
-          >
-            Ecommerce Starter Template
-          </Heading>
-          <Heading
-            level="h2"
-            className="text-3xl leading-10 text-ui-fg-subtle font-normal"
-          >
-            Powered by Medusa and Next.js
-          </Heading>
-        </span>
-        <a href="https://github.com/medusajs/dtc-starter" target="_blank">
-          <Button variant="secondary">
-            View on GitHub <Github />
-          </Button>
-        </a>
+    <div className="py-16 bg-white w-full">
+      <div className="content-container flex flex-col lg:flex-row items-center gap-12">
+        {/* Image Card Left */}
+        <div className="flex-1 w-full bg-slate-100 rounded-2xl shadow-xl overflow-hidden min-h-[400px] flex items-center justify-center relative">
+          <div className="text-slate-400 text-lg">Product Image Placeholder</div>
+          {/* Tagline */}
+          <div className="absolute bottom-6 inset-x-0 text-center">
+             <p className="text-sm text-slate-500 font-medium">Pearls | Paints | Effects</p>
+             <p className="font-bold text-slate-800 uppercase tracking-widest mt-1">AtoZ Colours Automotive</p>
+          </div>
+        </div>
+
+        {/* Text Right */}
+        <div className="flex-1 flex flex-col gap-6 p-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+            Engineered by Passion<br />Perfected by Precision
+          </h1>
+          <p className="text-slate-700 text-base leading-relaxed max-w-lg">
+            Built from passion and perfected through precision,
+            AtoZ Colours Automotive represents years of research, testing,
+            and craftsmanship. Since 2018, every formulation is
+            engineered in our paint lab to deliver depth, durability, and
+            unmatched visual impact — where technology meets
+            emotion, and finishes become art.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -61,3 +61,7 @@ uploads/
 *.db
 *.sqlite
 *.sqlite3
+
+# Nested repo folder
+atoz-colours-store/
+

@@ -120,6 +120,13 @@ export default function ProductActions({
 
   const inView = useIntersection(actionsRef, "0px")
 
+  const [quantity, setQuantity] = useState(1)
+
+  // Reset quantity to 1 when variant changes
+  useEffect(() => {
+    setQuantity(1)
+  }, [selectedVariant])
+
   // add the selected variant to the cart
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return null
@@ -128,7 +135,7 @@ export default function ProductActions({
 
     await addToCart({
       variantId: selectedVariant.id,
-      quantity: 1,
+      quantity: quantity,
       countryCode,
     })
 
@@ -162,6 +169,32 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
+        {/* Quantity Selector */}
+        {selectedVariant && (
+          <div className="flex flex-col gap-y-2 my-4">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-800">Quantity</span>
+            <div className="flex items-center border border-neutral-200 w-32 justify-between rounded-none bg-white">
+              <button
+                type="button"
+                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                className="px-4 py-2 text-slate-700 hover:bg-neutral-100 transition-colors font-bold text-base rounded-none border-r border-neutral-200"
+                disabled={!!disabled || isAdding}
+              >
+                -
+              </button>
+              <span className="text-sm font-semibold text-black w-8 text-center">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((prev) => prev + 1)}
+                className="px-4 py-2 text-slate-700 hover:bg-neutral-100 transition-colors font-bold text-base rounded-none border-l border-neutral-200"
+                disabled={!!disabled || isAdding}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        )}
+
         <Button
           onClick={handleAddToCart}
           disabled={
@@ -172,7 +205,7 @@ export default function ProductActions({
             !isValidVariant
           }
           variant="primary"
-          className="w-full h-10"
+          className="w-full h-12 rounded-none bg-black hover:bg-neutral-900 text-white font-bold uppercase tracking-wider transition-colors border border-black shadow-none"
           isLoading={isAdding}
           data-testid="add-product-button"
         >

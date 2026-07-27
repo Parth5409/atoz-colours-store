@@ -32,6 +32,41 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         >
           {product.description}
         </Text>
+
+        {/* Paint specifications */}
+        {(product.metadata?.color_hex || product.metadata?.mix_ratio || product.metadata?.hazmat_class) && (
+          <div className="mt-6 border-t border-neutral-200 pt-6">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-black mb-4">Paint Specifications</h3>
+            <div className="flex flex-col gap-y-3 text-sm">
+              {product.metadata?.color_hex && (
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500 font-medium">Color Swatch</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-neutral-600">{(product.metadata.color_hex as string).toUpperCase()}</span>
+                    <div
+                      className="w-5 h-5 border border-neutral-300 rounded-none shadow-none"
+                      style={{ backgroundColor: product.metadata.color_hex as string }}
+                    />
+                  </div>
+                </div>
+              )}
+              {product.metadata?.mix_ratio && (
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500 font-medium">Mix Ratio</span>
+                  <span className="font-semibold text-black">{product.metadata.mix_ratio as string}</span>
+                </div>
+              )}
+              {product.metadata?.hazmat_class && (
+                <div className="flex items-center justify-between">
+                  <span className="text-neutral-500 font-medium">Classification</span>
+                  <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 border border-red-200 font-semibold uppercase tracking-wider">
+                    {product.metadata.hazmat_class as string}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

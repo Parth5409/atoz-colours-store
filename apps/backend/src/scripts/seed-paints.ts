@@ -12,7 +12,12 @@ export default async function seedPaints({ container }: ExecArgs) {
   const pricingModuleService: IPricingModuleService = container.resolve(Modules.PRICING)
 
   // 2.1 Implement idempotent category upsert
-  const categoryHandles = ["candy-neon-basecoats", "pearl-shift-coatings", "gloss-clears"]
+  const categoryHandles = [
+    "candy-neon-basecoats", "pearl-shift-coatings", "gloss-clears",
+    "colour-changing", "dynamicshift", "colorshift", "lazerghost",
+    "pearls", "crystal-pearls", "vivid-pearls", "candy", "neons",
+    "metal-flake", "premix", "paint-shop"
+  ]
   const categories: Record<string, any> = {}
 
   for (const handle of categoryHandles) {
@@ -40,6 +45,27 @@ export default async function seedPaints({ container }: ExecArgs) {
     categories[handle] = category
   }
 
+  // Link child categories to parents
+  const parentChildRelations = [
+    { parent: "colour-changing", children: ["dynamicshift", "colorshift", "lazerghost"] },
+    { parent: "pearls", children: ["crystal-pearls", "vivid-pearls"] }
+  ]
+  for (const relation of parentChildRelations) {
+    const parent = categories[relation.parent]
+    if (parent) {
+      for (const childHandle of relation.children) {
+        const child = categories[childHandle]
+        if (child && !child.parent_category_id) {
+          await productModuleService.updateProductCategories(child.id, {
+            parent_category_id: parent.id
+          })
+          child.parent_category_id = parent.id
+          console.log(`Linked category ${childHandle} to parent ${relation.parent}`)
+        }
+      }
+    }
+  }
+
   // 3.1 Define the product catalogue
   const products = [
     { name: "Candy Apple Red", handle: "candy-apple-red", categoryHandle: "candy-neon-basecoats", color_hex: "#FF0800", mix_ratio: "2:1", hazmat_class: "Class 3 Flammable", prices: [1000, 1800, 3200] },
@@ -49,6 +75,15 @@ export default async function seedPaints({ container }: ExecArgs) {
     { name: "Diamond Blue Flake", handle: "diamond-blue-flake", categoryHandle: "pearl-shift-coatings", color_hex: "#0000FF", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1200, 2200, 4000] },
     { name: "Pitch Black Solid Gloss", handle: "pitch-black-solid-gloss", categoryHandle: "gloss-clears", color_hex: "#000000", mix_ratio: "4:1", hazmat_class: "Class 3 Flammable", prices: [800, 1500, 2800] },
     { name: "High Solid Clear Coat", handle: "high-solid-clear-coat", categoryHandle: "gloss-clears", color_hex: "#FFFFFF", mix_ratio: "4:1", hazmat_class: "Class 3 Flammable", prices: [800, 1500, 2800] },
+    // Specific storefront category mappings
+    { name: "Dynamicshift Aether", handle: "dynamicshift-aether", categoryHandle: "dynamicshift", color_hex: "#ff00aa", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1500, 2800, 5200] },
+    { name: "Colorshift Chameleon", handle: "colorshift-chameleon", categoryHandle: "colorshift", color_hex: "#00ffcc", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1300, 2400, 4500] },
+    { name: "Lazerghost Plasma", handle: "lazerghost-plasma", categoryHandle: "lazerghost", color_hex: "#a832a8", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1600, 3000, 5500] },
+    { name: "Crystal White Pearl", handle: "crystal-white-pearl", categoryHandle: "crystal-pearls", color_hex: "#f0f8ff", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1100, 2000, 3800] },
+    { name: "Vivid Violet Pearl", handle: "vivid-violet-pearl", categoryHandle: "vivid-pearls", color_hex: "#ee82ee", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1250, 2300, 4200] },
+    { name: "Candy Red Flake", handle: "candy-red-flake", categoryHandle: "candy", color_hex: "#d1001c", mix_ratio: "2:1", hazmat_class: "Class 3 Flammable", prices: [1000, 1850, 3400] },
+    { name: "Neon Glow Green", handle: "neon-glow-green", categoryHandle: "neons", color_hex: "#39ff14", mix_ratio: "2:1", hazmat_class: "Class 3 Flammable", prices: [950, 1700, 3100] },
+    { name: "Sparkle Silver Flake", handle: "sparkle-silver-flake", categoryHandle: "metal-flake", color_hex: "#c0c0c0", mix_ratio: "3:1:1", hazmat_class: "Class 3 Flammable", prices: [1100, 2000, 3700] },
   ]
 
   for (const productDef of products) {

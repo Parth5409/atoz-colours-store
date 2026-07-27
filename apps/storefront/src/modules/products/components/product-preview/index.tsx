@@ -36,13 +36,31 @@ export default async function ProductPreview({
           size="full"
           isFeatured={isFeatured}
         />
-        <div className="flex txt-compact-medium mt-4 justify-between">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">
-            {product.title}
-          </Text>
-          <div className="flex items-center gap-x-2">
+        <div className="flex flex-col mt-4 gap-y-1">
+          <div className="flex justify-between items-start gap-x-2">
+            <Text className="text-sm font-bold text-black uppercase tracking-wide group-hover:text-neutral-600 transition-colors" data-testid="product-title">
+              {product.title}
+            </Text>
             {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           </div>
+          
+          {/* Swatch & Paint metadata properties */}
+          {(product.metadata?.color_hex || product.metadata?.mix_ratio) && (
+            <div className="flex items-center gap-x-2 mt-1">
+              {product.metadata?.color_hex && (
+                <div 
+                  className="w-4 h-4 border border-neutral-300 rounded-none shadow-none" 
+                  style={{ backgroundColor: product.metadata.color_hex as string }}
+                  title={`Color: ${product.metadata.color_hex}`}
+                />
+              )}
+              {product.metadata?.mix_ratio && (
+                <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-widest">
+                  Mix: {product.metadata.mix_ratio as string}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </LocalizedClientLink>

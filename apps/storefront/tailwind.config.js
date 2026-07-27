@@ -19,7 +19,19 @@ module.exports = {
         visibility: "visibility",
         padding: "padding-top padding-right padding-bottom padding-left",
       },
+      backgroundImage: {
+        'rainbow-gradient': 'linear-gradient(to right, #ff003c, #ff5e00, #ffcc00, #00ff66, #00d4ff, #6a00ff, #b000ff)',
+      },
       colors: {
+        rainbow: {
+          red: "#ff003c",
+          orange: "#ff5e00",
+          yellow: "#ffcc00",
+          green: "#00ff66",
+          blue: "#00d4ff",
+          indigo: "#6a00ff",
+          violet: "#b000ff",
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -36,11 +48,21 @@ module.exports = {
       },
       borderRadius: {
         none: "0px",
-        soft: "2px",
-        base: "4px",
-        rounded: "8px",
-        large: "16px",
+        soft: "0px",
+        base: "0px",
+        rounded: "0px",
+        large: "0px",
         circle: "9999px",
+      },
+      boxShadow: {
+        none: "none",
+        DEFAULT: "none",
+        sm: "none",
+        md: "none",
+        lg: "none",
+        xl: "none",
+        "2xl": "none",
+        inner: "none",
       },
       maxWidth: {
         "8xl": "100rem",
@@ -59,6 +81,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
+          "Poppins",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",

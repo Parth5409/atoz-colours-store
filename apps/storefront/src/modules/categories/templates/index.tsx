@@ -36,12 +36,11 @@ export default function CategoryTemplate({
       getParents(category.parent_category)
     }
   }
-
   getParents(category)
 
   return (
     <div
-      className="flex flex-col small:flex-row small:items-start py-6 content-container"
+      className="flex flex-col small:flex-row small:items-start py-8 content-container gap-x-8"
       data-testid="category-container"
     >
       <RefinementList
@@ -50,24 +49,32 @@ export default function CategoryTemplate({
         hideOptionsPicker
       />
       <div className="w-full">
-        <div className="flex flex-row mb-8 text-2xl-semi gap-4">
-          {parents &&
-            parents.map((parent) => (
-              <span key={parent.id} className="text-ui-fg-subtle">
-                <LocalizedClientLink
-                  className="mr-4 hover:text-black"
-                  href={`/categories/${parent.handle}`}
-                  data-testid="sort-by-link"
-                >
-                  {parent.name}
-                </LocalizedClientLink>
-                /
-              </span>
-            ))}
-          <h1 data-testid="category-page-title">{category.name}</h1>
+        {/* Stark Clean Category Header */}
+        <div className="flex flex-col mb-8 pb-4 border-b border-neutral-200">
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-neutral-500 uppercase tracking-widest mb-3">
+            <LocalizedClientLink href="/" className="hover:text-black transition-colors">Home</LocalizedClientLink>
+            <span>/</span>
+            {parents &&
+              parents.map((parent) => (
+                <span key={parent.id} className="flex items-center gap-1.5">
+                  <LocalizedClientLink
+                    className="hover:text-black transition-colors"
+                    href={`/categories/${parent.handle}`}
+                  >
+                    {parent.name}
+                  </LocalizedClientLink>
+                  <span>/</span>
+                </span>
+              ))}
+            <span className="text-black font-semibold">{category.name}</span>
+          </div>
+          <h1 className="text-4xl font-bold uppercase tracking-wider text-black" data-testid="category-page-title">
+            {category.name}
+          </h1>
         </div>
+
         {category.description && (
-          <div className="mb-8 text-base-regular">
+          <div className="mb-10 text-sm text-neutral-600 leading-relaxed max-w-3xl">
             <p>{category.description}</p>
           </div>
         )}

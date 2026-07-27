@@ -1,41 +1,29 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
-import { listCollections } from "@lib/data/collections"
-import { getRegion } from "@lib/data/regions"
+import Categories from "@modules/home/components/categories"
+import FeaturedProducts from "@modules/home/components/featured-products"
+import WhyChooseUs from "@modules/home/components/why-choose-us"
+import FeaturedBlogs from "@modules/home/components/featured-blogs"
+import Faq from "@modules/home/components/faq"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
+  title: "AtoZ Colours | Automotive Custom Paints",
   description:
-    "A performant frontend ecommerce starter template with Next.js 15 and Medusa.",
+    "Premium automotive custom paints, candy colors, and pearls.",
 }
 
 export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) {
-  const params = await props.params
-
-  const { countryCode } = params
-
-  const region = await getRegion(countryCode)
-
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
-
-  if (!collections || !region) {
-    return null
-  }
-
   return (
     <>
+      <Categories />
       <Hero />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
+      <FeaturedProducts />
+      <WhyChooseUs />
+      <FeaturedBlogs />
+      <Faq />
     </>
   )
 }
