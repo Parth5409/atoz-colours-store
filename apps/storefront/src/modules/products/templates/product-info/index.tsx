@@ -1,75 +1,88 @@
 import { HttpTypes } from "@medusajs/types"
-import { Heading, Text } from "@modules/common/components/ui"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
 }
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
+  const brand = (product.metadata?.brand as string) || "BLACKFX AUTOMOTIVE"
+  const primaryBaseColor =
+    (product.metadata?.primary_base_color as string) ||
+    "Over a Black base coat Recommended also White,Silver,Grey basecoat optional"
+  const mixRatio = (product.metadata?.mix_ratio as string) || "2:1 pu Thinner ratio"
+  const particleSize =
+    (product.metadata?.particle_size as string) || "15-78 UM Pearls"
+  const testSampleNote =
+    (product.metadata?.test_sample_note as string) ||
+    "Do a test sample for better understanding"
+  const topCoatTitle =
+    (product.metadata?.top_coat_title as string) || "TOP COAT CLEAR"
+  const topCoatDesc =
+    (product.metadata?.top_coat_desc as string) ||
+    "Finish with a UV protected clear coat (typically 2-3 coats). For best results, follow the coating manufacturer's recommended flash time in between coats, according to the temperature you are spraying in"
+
   return (
-    <div id="product-info">
-      <div className="flex flex-col gap-y-4 lg:max-w-[500px] mx-auto">
-        {product.collection && (
-          <LocalizedClientLink
-            href={`/collections/${product.collection.handle}`}
-            className="text-medium text-ui-fg-muted hover:text-ui-fg-subtle"
-          >
-            {product.collection.title}
-          </LocalizedClientLink>
-        )}
-        <Heading
-          level="h2"
-          className="text-3xl leading-10 text-ui-fg-base"
-          data-testid="product-title"
-        >
-          {product.title}
-        </Heading>
+    <div id="product-info" className="flex flex-col gap-y-5 text-slate-800">
+      {/* Brand Subtitle */}
+      <div className="text-xs uppercase font-mono tracking-widest text-neutral-400 font-bold">
+        {brand}
+      </div>
 
-        <Text
-          className="text-medium text-ui-fg-subtle whitespace-pre-line"
-          data-testid="product-description"
-        >
-          {product.description}
-        </Text>
+      {/* Main Title */}
+      <h1
+        className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900"
+        data-testid="product-title"
+      >
+        {product.title}
+      </h1>
 
-        {/* Paint specifications */}
-        {(product.metadata?.color_hex || product.metadata?.mix_ratio || product.metadata?.hazmat_class) && (
-          <div className="mt-6 border-t border-neutral-200 pt-6">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-black mb-4">Paint Specifications</h3>
-            <div className="flex flex-col gap-y-3 text-sm">
-              {product.metadata?.color_hex && (
-                <div className="flex items-center justify-between">
-                  <span className="text-neutral-500 font-medium">Color Swatch</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-neutral-600">{(product.metadata.color_hex as string).toUpperCase()}</span>
-                    <div
-                      className="w-5 h-5 border border-neutral-300 rounded-none shadow-none"
-                      style={{ backgroundColor: product.metadata.color_hex as string }}
-                    />
-                  </div>
-                </div>
-              )}
-              {product.metadata?.mix_ratio && (
-                <div className="flex items-center justify-between">
-                  <span className="text-neutral-500 font-medium">Mix Ratio</span>
-                  <span className="font-semibold text-black">{product.metadata.mix_ratio as string}</span>
-                </div>
-              )}
-              {product.metadata?.hazmat_class && (
-                <div className="flex items-center justify-between">
-                  <span className="text-neutral-500 font-medium">Classification</span>
-                  <span className="text-xs bg-red-50 text-red-700 px-2 py-0.5 border border-red-200 font-semibold uppercase tracking-wider">
-                    {product.metadata.hazmat_class as string}
-                  </span>
-                </div>
-              )}
-            </div>
+      {/* Technical Specifications Table */}
+      <div className="bg-neutral-200/70 border border-neutral-300 rounded-lg overflow-hidden text-xs md:text-sm my-2">
+        <div className="grid grid-cols-12 border-b border-neutral-300">
+          <div className="col-span-5 p-3.5 font-semibold text-neutral-600 border-r border-neutral-300 flex items-center">
+            Primary Base Color
           </div>
-        )}
+          <div className="col-span-7 p-3.5 text-neutral-800 leading-snug">
+            {primaryBaseColor}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-12 border-b border-neutral-300 bg-white">
+          <div className="col-span-5 p-3.5 font-semibold text-neutral-600 border-r border-neutral-300 flex items-center">
+            Mixing Ratio
+          </div>
+          <div className="col-span-7 p-3.5 text-neutral-800 font-mono">
+            {mixRatio}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-12 bg-neutral-200/70">
+          <div className="col-span-5 p-3.5 font-semibold text-neutral-600 border-r border-neutral-300 flex items-center">
+            Particle Size
+          </div>
+          <div className="col-span-7 p-3.5 text-neutral-800 font-mono">
+            {particleSize}
+          </div>
+        </div>
+      </div>
+
+      {/* Test Sample Recommendation */}
+      <p className="text-xs font-semibold text-slate-700 italic">
+        {testSampleNote}
+      </p>
+
+      {/* Top Coat Clear Guide */}
+      <div className="space-y-1.5 pt-2">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 font-mono">
+          {topCoatTitle}
+        </h3>
+        <p className="text-xs text-neutral-600 leading-relaxed">
+          {topCoatDesc}
+        </p>
       </div>
     </div>
   )
 }
 
 export default ProductInfo
+

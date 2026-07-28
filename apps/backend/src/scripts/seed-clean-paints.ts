@@ -120,23 +120,53 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
 
   // 5. Seed Paint Products
   const productsToSeed = [
+    {
+      name: "Jade Green",
+      handle: "jade-green",
+      categoryHandle: "crystal-pearls",
+      brand: "BLACKFX AUTOMOTIVE",
+      color_hex: "#00A86B",
+      primary_base_color: "Over a Black base coat Recommended also White,Silver,Grey basecoat optional",
+      mix_ratio: "2:1 pu Thinner ratio",
+      particle_size: "15-78 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats). For best results, follow the coating manufacturer's recommended flash time in between coats, according to the temperature you are spraying in",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
+      hazmat_class: "Class 3 Flammable",
+      prices: [105000, 175000, 320000] // 300ml, 500ml, 1L (Rs 1050, 1750, 3200)
+    },
     // Colour Changing -> Dynamicshift
     {
       name: "Dynamicshift Aether",
       handle: "dynamicshift-aether",
       categoryHandle: "dynamicshift",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#ff00aa",
+      primary_base_color: "Over a Black base coat",
       mix_ratio: "3:1:1",
+      particle_size: "10-60 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
-      prices: [150000, 280000, 520000] // In INR paise (Rs 1500, 2800, 5200)
+      prices: [150000, 280000, 520000]
     },
     // Colour Changing -> Colorshift
     {
       name: "Colorshift Chameleon",
       handle: "colorshift-chameleon",
       categoryHandle: "colorshift",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#00ffcc",
+      primary_base_color: "Over a Black base coat",
       mix_ratio: "3:1:1",
+      particle_size: "10-60 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [130000, 240000, 450000]
     },
@@ -145,8 +175,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Lazerghost Plasma",
       handle: "lazerghost-plasma",
       categoryHandle: "lazerghost",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#a832a8",
+      primary_base_color: "Over a Black base coat",
       mix_ratio: "3:1:1",
+      particle_size: "10-60 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [160000, 300000, 550000]
     },
@@ -155,8 +192,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Crystal White Pearl",
       handle: "crystal-white-pearl",
       categoryHandle: "crystal-pearls",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#f0f8ff",
+      primary_base_color: "Over a White base coat",
       mix_ratio: "3:1:1",
+      particle_size: "10-60 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [110000, 200000, 380000]
     },
@@ -165,8 +209,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Vivid Violet Pearl",
       handle: "vivid-violet-pearl",
       categoryHandle: "vivid-pearls",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#ee82ee",
+      primary_base_color: "Over a Black base coat",
       mix_ratio: "3:1:1",
+      particle_size: "10-60 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [125000, 230000, 420000]
     },
@@ -175,8 +226,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Candy Apple Red",
       handle: "candy-apple-red",
       categoryHandle: "candy",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#FF0800",
+      primary_base_color: "Over a Silver base coat",
       mix_ratio: "2:1",
+      particle_size: "15-78 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [100000, 180000, 320000]
     },
@@ -184,8 +242,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Electric Orange",
       handle: "electric-orange",
       categoryHandle: "candy",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#FF4500",
+      primary_base_color: "Over a Silver base coat",
       mix_ratio: "2:1",
+      particle_size: "15-78 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [100000, 180000, 320000]
     },
@@ -194,8 +259,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Neon Glow Green",
       handle: "neon-glow-green",
       categoryHandle: "neons",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#39ff14",
+      primary_base_color: "Over a White base coat",
       mix_ratio: "2:1",
+      particle_size: "15-78 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [95000, 170000, 310000]
     },
@@ -203,8 +275,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Neon Blaze Pink",
       handle: "neon-blaze-pink",
       categoryHandle: "neons",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#ff69b4",
+      primary_base_color: "Over a White base coat",
       mix_ratio: "2:1",
+      particle_size: "15-78 UM Pearls",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [95000, 170000, 310000]
     },
@@ -213,8 +292,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Sparkle Silver Flake",
       handle: "sparkle-silver-flake",
       categoryHandle: "metal-flake",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#c0c0c0",
+      primary_base_color: "Over a Black base coat",
       mix_ratio: "3:1:1",
+      particle_size: "200-400 UM Flake",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Finish with a UV protected clear coat (typically 2-3 coats).",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [110000, 200000, 370000]
     },
@@ -223,8 +309,15 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "Pitch Black Solid Gloss",
       handle: "pitch-black-solid-gloss",
       categoryHandle: "premix",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#000000",
+      primary_base_color: "Direct Gloss - No Base Coat Required",
       mix_ratio: "4:1",
+      particle_size: "N/A - Solid Pigment",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "Direct gloss, top coat clear optional.",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [80000, 150000, 280000]
     },
@@ -232,28 +325,43 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
       name: "High Solid Clear Coat",
       handle: "high-solid-clear-coat",
       categoryHandle: "premix",
+      brand: "BLACKFX AUTOMOTIVE",
       color_hex: "#FFFFFF",
+      primary_base_color: "Clear Coat Over Basecoat",
       mix_ratio: "4:1",
+      particle_size: "N/A - Clear Coat",
+      test_sample_note: "Do a test sample for better understanding",
+      top_coat_title: "TOP COAT CLEAR",
+      top_coat_desc: "High solids polyurethane clear coat.",
+      pickup_info: "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours",
       hazmat_class: "Class 3 Flammable",
       prices: [80000, 150000, 280000]
     }
   ]
 
-  const volumes = ["250ml Aerosol", "500ml Tin", "1L Tin"]
+  const volumes = ["300ml", "500ml", "1L"]
 
   for (const productDef of productsToSeed) {
     try {
       const product = await productModuleService.createProducts({
         title: productDef.name,
         handle: productDef.handle,
-        options: [{ title: "Volume", values: volumes }],
+        options: [{ title: "Quantity", values: volumes }],
         status: "published",
         metadata: {
+          brand: productDef.brand,
           color_hex: productDef.color_hex,
+          primary_base_color: productDef.primary_base_color,
           mix_ratio: productDef.mix_ratio,
+          particle_size: productDef.particle_size,
+          test_sample_note: productDef.test_sample_note,
+          top_coat_title: productDef.top_coat_title,
+          top_coat_desc: productDef.top_coat_desc,
+          pickup_info: productDef.pickup_info,
           hazmat_class: productDef.hazmat_class
         }
       })
+
       
       console.log(`Created product: ${product.handle}`)
 
@@ -272,7 +380,7 @@ export default async function seedCleanPaints({ container }: ExecArgs) {
           product_id: product.id,
           title: volumes[i],
           options: {
-            Volume: volumes[i]
+            Quantity: volumes[i]
           }
         })
 

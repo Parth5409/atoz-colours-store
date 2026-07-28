@@ -3,15 +3,12 @@
 import { addToCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@modules/common/components/ui"
-import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
-import { useParams, usePathname, useSearchParams } from "next/navigation"
+import { useParams, usePathname, useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
-import { useRouter } from "next/navigation"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -40,11 +37,15 @@ export default function ProductActions({
   const [isAdding, setIsAdding] = useState(false)
   const countryCode = useParams().countryCode as string
 
-  // If there is only 1 variant, preselect the options
+  // If there is only 1 variant, preselect options
   useEffect(() => {
     if (product.variants?.length === 1) {
       const variantOptions = optionsAsKeymap(product.variants[0].options)
       setOptions(variantOptions ?? {})
+    } else if (product.variants && product.variants.length > 0 && Object.keys(options).length === 0) {
+      // Preselect first variant options
+      const firstVariantOptions = optionsAsKeymap(product.variants[0].options)
+      setOptions(firstVariantOptions ?? {})
     }
   }, [product.variants])
 
@@ -59,7 +60,6 @@ export default function ProductActions({
     })
   }, [product.variants, options])
 
-  // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
     setOptions((prev) => ({
       ...prev,
@@ -67,7 +67,6 @@ export default function ProductActions({
     }))
   }
 
-  //check if the selected options produce a valid variant
   const isValidVariant = useMemo(() => {
     return product.variants?.some((v) => {
       const variantOptions = optionsAsKeymap(v.options)
@@ -92,45 +91,32 @@ export default function ProductActions({
     router.replace(pathname + "?" + params.toString())
   }, [selectedVariant, isValidVariant])
 
-  // check if the selected variant is in stock
   const inStock = useMemo(() => {
-    // If we don't manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
     }
-
-    // If we allow back orders on the variant, we can add to cart
     if (selectedVariant?.allow_backorder) {
       return true
     }
-
-    // If there is inventory available, we can add to cart
     if (
       selectedVariant?.manage_inventory &&
       (selectedVariant?.inventory_quantity || 0) > 0
     ) {
       return true
     }
-
-    // Otherwise, we can't add to cart
     return false
   }, [selectedVariant])
 
   const actionsRef = useRef<HTMLDivElement>(null)
-
   const inView = useIntersection(actionsRef, "0px")
-
   const [quantity, setQuantity] = useState(1)
 
-  // Reset quantity to 1 when variant changes
   useEffect(() => {
     setQuantity(1)
   }, [selectedVariant])
 
-  // add the selected variant to the cart
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return null
-
     setIsAdding(true)
 
     await addToCart({
@@ -142,51 +128,85 @@ export default function ProductActions({
     setIsAdding(false)
   }
 
+  const handleBuyNow = async () => {
+    if (!selectedVariant?.id) return null
+    setIsAdding(true)
+    await addToCart({
+      variantId: selectedVariant.id,
+      quantity: quantity,
+      countryCode,
+    })
+    setIsAdding(false)
+    router.push(`/${countryCode}/cart`)
+  }
+
+  const pickupInfo =
+    (product.metadata?.pickup_info as string) ||
+    "Pickup available at blackfx ground floor 33/547\nUsually ready in 24 hours"
+
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
-        <div>
-          {(product.variants?.length ?? 0) > 1 && (
-            <div className="flex flex-col gap-y-4">
-              {(product.options || []).map((option) => {
-                return (
-                  <div key={option.id}>
-                    <OptionSelect
-                      option={option}
-                      current={options[option.id]}
-                      updateOption={setOptionValue}
-                      title={option.title ?? ""}
-                      data-testid="product-options"
-                      disabled={!!disabled || isAdding}
-                    />
-                  </div>
-                )
-              })}
-              <Divider />
-            </div>
-          )}
+      <div className="flex flex-col gap-y-4" ref={actionsRef}>
+        {/* Price display with shipping note */}
+        <div className="flex flex-col gap-y-0.5">
+          <ProductPrice product={product} variant={selectedVariant} />
+          <span className="text-[11px] text-neutral-400">
+            <span className="underline cursor-pointer">Shipping</span> calculated at checkout.
+          </span>
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
+        {/* Options Pill Selection (Quantity / Size) */}
+        <div>
+          {(product.options || []).map((option) => {
+            return (
+              <div key={option.id} className="flex flex-col gap-y-2 mb-3">
+                <span className="text-xs text-neutral-500 font-medium capitalize">
+                  {option.title || "Quantity"}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {option.values?.map((val: any) => {
+                    const valueStr = typeof val === "string" ? val : val.value
+                    const isSelected = options[option.id] === valueStr
+                    return (
+                      <button
+                        key={valueStr}
+                        type="button"
+                        onClick={() => setOptionValue(option.id, valueStr)}
+                        disabled={!!disabled || isAdding}
+                        className={`px-5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 ${
+                          isSelected
+                            ? "bg-[#0B2533] text-white border-[#0B2533]"
+                            : "bg-white text-slate-700 border-neutral-300 hover:border-black"
+                        }`}
+                      >
+                        {valueStr}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
 
-        {/* Quantity Selector */}
+        {/* Quantity Increment/Decrement Selector */}
         {selectedVariant && (
-          <div className="flex flex-col gap-y-2 my-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-800">Quantity</span>
-            <div className="flex items-center border border-neutral-200 w-32 justify-between rounded-none bg-white">
+          <div className="flex flex-col gap-y-1.5 my-1">
+            <span className="text-xs text-neutral-500 font-medium">Quantity</span>
+            <div className="flex items-center border border-neutral-300 w-28 justify-between rounded-md bg-white overflow-hidden text-sm">
               <button
                 type="button"
                 onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                className="px-4 py-2 text-slate-700 hover:bg-neutral-100 transition-colors font-bold text-base rounded-none border-r border-neutral-200"
+                className="px-3 py-1.5 text-neutral-600 hover:bg-neutral-100 font-medium border-r border-neutral-200"
                 disabled={!!disabled || isAdding}
               >
-                -
+                −
               </button>
-              <span className="text-sm font-semibold text-black w-8 text-center">{quantity}</span>
+              <span className="font-semibold text-slate-800">{quantity}</span>
               <button
                 type="button"
                 onClick={() => setQuantity((prev) => prev + 1)}
-                className="px-4 py-2 text-slate-700 hover:bg-neutral-100 transition-colors font-bold text-base rounded-none border-l border-neutral-200"
+                className="px-3 py-1.5 text-neutral-600 hover:bg-neutral-100 font-medium border-l border-neutral-200"
                 disabled={!!disabled || isAdding}
               >
                 +
@@ -195,26 +215,43 @@ export default function ProductActions({
           </div>
         )}
 
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          variant="primary"
-          className="w-full h-12 rounded-none bg-black hover:bg-neutral-900 text-white font-bold uppercase tracking-wider transition-colors border border-black shadow-none"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !options
-            ? "Select variant"
-            : !inStock || !isValidVariant
-            ? "Out of stock"
-            : "Add to cart"}
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-y-2.5 pt-2">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!inStock || !selectedVariant || !!disabled || isAdding || !isValidVariant}
+            className="w-full py-3.5 px-6 rounded-full border border-neutral-800 text-slate-900 bg-white hover:bg-neutral-50 font-semibold text-sm transition-colors shadow-none disabled:opacity-50"
+          >
+            {isAdding ? "Adding..." : !inStock || !isValidVariant ? "Out of stock" : "Add to cart"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={!inStock || !selectedVariant || !!disabled || isAdding || !isValidVariant}
+            className="w-full py-3.5 px-6 rounded-full text-white bg-[#0B2533] hover:bg-[#071A24] font-semibold text-sm transition-colors shadow-none disabled:opacity-50"
+          >
+            Buy it now
+          </button>
+        </div>
+
+        {/* Store Pickup Availability Banner */}
+        <div className="mt-4 pt-4 border-t border-neutral-200 text-xs text-neutral-600 space-y-1">
+          <div className="flex items-start gap-1.5 text-emerald-700">
+            <span>✓</span>
+            <span className="font-medium text-neutral-700 whitespace-pre-line leading-relaxed">
+              {pickupInfo}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="text-[11px] underline text-neutral-500 hover:text-black pt-1 block"
+          >
+            View store information
+          </button>
+        </div>
+
         <MobileActions
           product={product}
           variant={selectedVariant}
@@ -230,3 +267,4 @@ export default function ProductActions({
     </>
   )
 }
+

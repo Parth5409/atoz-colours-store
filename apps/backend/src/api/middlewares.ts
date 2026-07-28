@@ -4,6 +4,12 @@ import { requireRole } from "./middlewares/require-role";
 export default defineMiddlewares({
   routes: [
     {
+      matcher: "/admin/products*",
+      bodyParser: {
+        sizeLimit: "15mb",
+      },
+    },
+    {
       matcher: "/admin/store*",
       method: ["POST", "PUT", "DELETE"],
       middlewares: [requireRole("super_admin")],
@@ -30,3 +36,4 @@ export default defineMiddlewares({
     },
   ],
 });
+

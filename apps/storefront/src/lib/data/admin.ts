@@ -23,6 +23,18 @@ export const getAdminAuthHeaders = async (): Promise<
   }
 }
 
+// Verify if admin JWT session cookie exists on server
+export async function checkAdminSession(): Promise<boolean> {
+  try {
+    const headers = await getAdminAuthHeaders()
+    return !!headers.authorization
+  } catch (error) {
+    console.warn("Failed to check admin session:", error)
+    return false
+  }
+}
+
+
 // Log in as an administrator
 export async function adminLogin(
   _currentState: unknown,
@@ -64,25 +76,40 @@ export async function adminLogout() {
   redirect("/admin/login")
 }
 
-// Retrieve products using admin privilege
+// Retrieve products using admin privilege (with public store fallback)
 export async function retrieveAdminProducts() {
   const headers = await getAdminAuthHeaders()
-  if (!headers.authorization) {
-    return []
+
+  if (headers.authorization) {
+    try {
+      const response = await sdk.client.fetch<{ products: any[] }>("/admin/products", {
+        method: "GET",
+        headers,
+        query: {
+          limit: 100,
+          fields: "*categories,*variants,*variants.prices",
+        },
+      })
+      if (response?.products && response.products.length > 0) {
+        return response.products
+      }
+    } catch (error) {
+      console.warn("Failed to fetch via /admin/products, falling back to /store/products:", error)
+    }
   }
 
+  // Fallback to store products API
   try {
-    const response = await sdk.client.fetch<{ products: any[] }>("/admin/products", {
+    const storeResp = await sdk.client.fetch<{ products: any[] }>("/store/products", {
       method: "GET",
-      headers,
       query: {
         limit: 100,
         fields: "*categories,*variants,*variants.prices",
       },
     })
-    return response.products
-  } catch (error) {
-    console.error("Failed to retrieve admin products:", error)
+    return storeResp?.products || []
+  } catch (err) {
+    console.error("Failed to retrieve products:", err)
     return []
   }
 }
@@ -91,7 +118,7 @@ export async function retrieveAdminProducts() {
 export async function createAdminProduct(payload: any) {
   const headers = await getAdminAuthHeaders()
   if (!headers.authorization) {
-    throw new Error("Unauthorized")
+    throw new Error("Unauthorized: Please log in as store admin.")
   }
 
   try {
@@ -113,7 +140,7 @@ export async function createAdminProduct(payload: any) {
 export async function deleteAdminProduct(productId: string) {
   const headers = await getAdminAuthHeaders()
   if (!headers.authorization) {
-    throw new Error("Unauthorized")
+    throw new Error("Unauthorized: Please log in as store admin.")
   }
 
   try {
@@ -128,25 +155,39 @@ export async function deleteAdminProduct(productId: string) {
   }
 }
 
-// Retrieve categories using admin privilege
+// Retrieve categories using admin privilege (with store fallback)
 export async function retrieveAdminCategories() {
   const headers = await getAdminAuthHeaders()
-  if (!headers.authorization) {
-    return []
+
+  if (headers.authorization) {
+    try {
+      const response = await sdk.client.fetch<{ product_categories: any[] }>("/admin/product-categories", {
+        method: "GET",
+        headers,
+        query: {
+          limit: 100,
+        },
+      })
+      if (response?.product_categories) {
+        return response.product_categories
+      }
+    } catch (error) {
+      console.warn("Failed to retrieve admin categories, falling back to store categories:", error)
+    }
   }
 
   try {
-    const response = await sdk.client.fetch<{ product_categories: any[] }>("/admin/product-categories", {
+    const storeCatResp = await sdk.client.fetch<{ product_categories: any[] }>("/store/product-categories", {
       method: "GET",
-      headers,
       query: {
         limit: 100,
       },
     })
-    return response.product_categories
-  } catch (error) {
-    console.error("Failed to retrieve admin categories:", error)
+    return storeCatResp?.product_categories || []
+  } catch (err) {
+    console.error("Failed to retrieve categories:", err)
     return []
   }
 }
+
 
