@@ -50,15 +50,15 @@ export default async function StoreTemplate({
   )
 
   return (
-    <div className="py-10 content-container space-y-16">
-      {/* Category-Wise Header */}
-      <div className="border-b border-neutral-200 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="py-12 content-container space-y-16">
+      {/* Posh Category-Wise Header */}
+      <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <span className="text-xs uppercase font-mono tracking-widest text-neutral-400 font-bold block mb-2">
-            ATOZ COLOURS / CATEGORY SELECTION
+          <span className="text-xs uppercase font-mono tracking-widest text-cyan-400 font-bold block mb-2">
+            ATOZ COLOURS / AUTOMOTIVE SHADES
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold uppercase tracking-tight text-slate-900">
-            Paint Collections by Category
+          <h1 className="text-3xl md:text-5xl font-extrabold uppercase tracking-tight text-white font-sans">
+            Paint Collections <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">by Category</span>
           </h1>
         </div>
 
@@ -68,7 +68,7 @@ export default async function StoreTemplate({
             <LocalizedClientLink
               key={cat.id}
               href={`/categories/${cat.handle}`}
-              className="px-3 py-1.5 border border-neutral-300 hover:border-black bg-white text-slate-800 hover:text-black font-semibold uppercase tracking-wider transition-all"
+              className="px-3.5 py-2 border border-slate-700/80 hover:border-cyan-400 bg-slate-950/70 text-slate-200 hover:text-white rounded-xl font-semibold uppercase tracking-wider transition-all hover:scale-105 hover:shadow-glow"
             >
               {cat.name}
             </LocalizedClientLink>
@@ -78,28 +78,29 @@ export default async function StoreTemplate({
 
       {/* Render Each Category Block */}
       {categoryBlocks.map(({ category, products }) => (
-        <section key={category.id} className="space-y-6 pt-4 border-t border-neutral-100">
+        <section key={category.id} className="space-y-6 pt-6 border-t border-slate-800/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="w-3 h-3 bg-black rounded-none" />
-              <h2 className="text-2xl font-bold uppercase tracking-wider text-slate-900">
+              <span className="w-3.5 h-3.5 bg-cyan-400 rounded-sm shadow-[0_0_12px_rgba(56,189,248,0.6)]" />
+              <h2 className="text-2xl md:text-3xl font-extrabold uppercase tracking-wider text-white">
                 {category.name}
               </h2>
-              <span className="text-xs font-mono bg-neutral-100 text-neutral-600 px-2 py-0.5 font-bold border border-neutral-200">
-                {products.length} {products.length === 1 ? "Product" : "Products"}
+              <span className="text-xs font-mono bg-slate-800/80 text-cyan-300 px-3 py-1 rounded-full font-bold border border-slate-700">
+                {products.length} {products.length === 1 ? "Shade" : "Shades"}
               </span>
             </div>
 
             <LocalizedClientLink
               href={`/categories/${category.handle}`}
-              className="text-xs font-mono font-bold uppercase tracking-wider text-black hover:underline flex items-center gap-1"
+              className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 group"
             >
-              Explore {category.name} &rarr;
+              <span>Explore {category.name}</span>
+              <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
             </LocalizedClientLink>
           </div>
 
           {category.description && (
-            <p className="text-xs text-neutral-500 max-w-2xl font-sans">
+            <p className="text-sm text-slate-400 max-w-2xl font-sans leading-relaxed">
               {category.description}
             </p>
           )}
@@ -107,12 +108,12 @@ export default async function StoreTemplate({
           {/* Subcategories Pills */}
           {category.category_children && category.category_children.length > 0 && (
             <div className="flex flex-wrap gap-2 text-[11px] font-mono">
-              <span className="text-neutral-400 font-bold uppercase py-1">Subcategories:</span>
+              <span className="text-slate-500 font-bold uppercase py-1">Subcategories:</span>
               {category.category_children.map((sub: any) => (
                 <LocalizedClientLink
                   key={sub.id}
                   href={`/categories/${sub.handle}`}
-                  className="px-2.5 py-1 bg-neutral-100 hover:bg-black hover:text-white border border-neutral-200 text-neutral-700 transition-colors uppercase font-semibold"
+                  className="px-3 py-1 bg-slate-900/90 hover:bg-cyan-500 hover:text-slate-950 border border-slate-800 text-slate-300 rounded-full transition-all uppercase font-semibold hover:shadow-glow"
                 >
                   {sub.name}
                 </LocalizedClientLink>
@@ -122,21 +123,21 @@ export default async function StoreTemplate({
 
           {/* Product Grid for this Category */}
           {products.length > 0 ? (
-            <div className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-x-6 gap-y-8 pt-2">
+            <div className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-6 pt-2">
               {products.map((product: any) => (
                 <ProductPreview key={product.id} product={product} region={undefined as any} />
               ))}
             </div>
           ) : (
-            <div className="p-8 bg-neutral-50 border border-dashed border-neutral-200 text-center space-y-2">
-              <span className="text-xs font-mono uppercase text-neutral-400 font-bold block">
-                No custom paints listed in {category.name} yet
+            <div className="p-8 bg-slate-900/40 border border-dashed border-slate-800 rounded-2xl text-center space-y-2">
+              <span className="text-xs font-mono uppercase text-slate-500 font-bold block">
+                No custom shades listed in {category.name} yet
               </span>
               <LocalizedClientLink
                 href="/admin/dashboard"
-                className="inline-block text-[11px] font-mono font-bold uppercase text-black underline"
+                className="inline-block text-xs font-mono font-bold uppercase text-cyan-400 hover:text-cyan-300 underline"
               >
-                + Add Paint in Admin Panel
+                + Add Shade in Admin Panel
               </LocalizedClientLink>
             </div>
           )}
@@ -145,17 +146,17 @@ export default async function StoreTemplate({
 
       {/* Uncategorized Section if any exist */}
       {uncategorizedProducts.length > 0 && (
-        <section className="space-y-6 pt-4 border-t border-neutral-100">
+        <section className="space-y-6 pt-6 border-t border-slate-800/60">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold uppercase tracking-wider text-slate-900">
-              Other Custom Paints
+            <h2 className="text-2xl font-bold uppercase tracking-wider text-white">
+              Other Custom Shades
             </h2>
-            <span className="text-xs font-mono bg-neutral-100 text-neutral-600 px-2 py-0.5 font-bold">
-              {uncategorizedProducts.length} Products
+            <span className="text-xs font-mono bg-slate-800 text-cyan-300 px-3 py-1 rounded-full font-bold">
+              {uncategorizedProducts.length} Shades
             </span>
           </div>
 
-          <div className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-x-6 gap-y-8 pt-2">
+          <div className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-6 pt-2">
             {uncategorizedProducts.map((product: any) => (
               <ProductPreview key={product.id} product={product} region={undefined as any} />
             ))}
