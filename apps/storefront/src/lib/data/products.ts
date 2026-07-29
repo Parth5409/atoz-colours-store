@@ -56,8 +56,10 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
+  const cacheOpts = await getCacheOptions("products")
   const next = {
-    ...(await getCacheOptions("products")),
+    ...cacheOpts,
+    tags: Array.from(new Set([...(cacheOpts.tags || []), "products"])),
   }
 
   return sdk.client
@@ -75,7 +77,7 @@ export const listProducts = async ({
         },
         headers,
         next,
-        cache: "force-cache",
+        cache: "no-cache",
       }
     )
     .then(({ products, count }) => {

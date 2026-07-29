@@ -1,11 +1,12 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { createAdminProduct, retrieveAdminCategories } from "@lib/data/admin"
+import { createAdminProduct, updateAdminProduct, retrieveAdminCategories } from "@lib/data/admin"
 
 interface ColorFormProps {
   onClose: () => void
   onSuccess: () => void
+  productToEdit?: any
 }
 
 const SIZES = ["300ml", "500ml", "1L"]
@@ -13,43 +14,84 @@ const FINISHES = ["Gloss", "Matte", "Basecoat"]
 
 type TabType = "general" | "specs" | "media" | "guide" | "pricing"
 
-export default function ColorForm({ onClose, onSuccess }: ColorFormProps) {
+export function generatePaintSvgDataUri(title: string, hexColor: string, brand = "BLACKFX AUTOMOTIVE"): string {
+  const safeTitle = (title || "Custom Paint").toUpperCase()
+  const safeHex = hexColor || "#00A86B"
+  const safeBrand = (brand || "BLACKFX AUTOMOTIVE").toUpperCase()
+  
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+    <defs>
+      <radialGradient id="grad" cx="50%" cy="35%" r="65%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+        <stop offset="60%" stop-color="${safeHex}" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#0b0b0b" stop-opacity="0.9"/>
+      </radialGradient>
+      <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+        <stop offset="50%" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect width="800" height="800" fill="#121212"/>
+    <rect width="760" height="760" x="20" y="20" fill="url(#grad)" rx="16"/>
+    <rect width="760" height="760" x="20" y="20" fill="url(#shine)" rx="16"/>
+    <circle cx="400" cy="350" r="180" fill="${safeHex}" stroke="#ffffff" stroke-width="4"/>
+    <text x="400" y="580" text-anchor="middle" fill="#ffffff" font-family="monospace, sans-serif" font-size="22" font-weight="bold" letter-spacing="4">${safeBrand}</text>
+    <text x="400" y="630" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="32" font-weight="900" letter-spacing="2">${safeTitle}</text>
+    <text x="400" y="675" text-anchor="middle" fill="${safeHex}" font-family="monospace, sans-serif" font-size="20" font-weight="bold" letter-spacing="3">${safeHex}</text>
+  </svg>`
+  
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+}
+
+export default function ColorForm({ onClose, onSuccess, productToEdit }: ColorFormProps) {
+  const isEditing = Boolean(productToEdit)
   const [activeTab, setActiveTab] = useState<TabType>("general")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [categories, setCategories] = useState<any[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>("")
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    productToEdit?.categories?.[0]?.id || ""
+  )
 
   // Form states
-  const [brand, setBrand] = useState("BLACKFX AUTOMOTIVE")
-  const [title, setTitle] = useState("")
-  const [handle, setHandle] = useState("")
-  const [description, setDescription] = useState("")
-  const [hexColor, setHexColor] = useState("#00A86B")
+  const [brand, setBrand] = useState(productToEdit?.metadata?.brand || "BLACKFX AUTOMOTIVE")
+  const [title, setTitle] = useState(productToEdit?.title || "")
+  const [handle, setHandle] = useState(productToEdit?.handle || "")
+  const [description, setDescription] = useState(productToEdit?.description || "")
+  const [hexColor, setHexColor] = useState(productToEdit?.metadata?.color_hex || "#00A86B")
   
   // Media / Image states
-  const [coverImageUrl, setCoverImageUrl] = useState("https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=800&auto=format&fit=crop")
-  const [galleryUrls, setGalleryUrls] = useState<string[]>([])
+  const [coverImageUrl, setCoverImageUrl] = useState(
+    productToEdit?.thumbnail || productToEdit?.metadata?.image_url || ""
+  )
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(
+    productToEdit?.images?.map((img: any) => img.url) || []
+  )
   const [newGalleryInput, setNewGalleryInput] = useState("")
 
   // Tech specs
   const [primaryBaseColor, setPrimaryBaseColor] = useState(
-    "Over a Black base coat Recommended also White,Silver,Grey basecoat optional"
+    productToEdit?.metadata?.primary_base_color ||
+      "Over a Black base coat Recommended also White,Silver,Grey basecoat optional"
   )
-  const [mixRatio, setMixRatio] = useState("2:1 pu Thinner ratio")
-  const [particleSize, setParticleSize] = useState("15-78 UM Pearls")
-  const [hazmatClass, setHazmatClass] = useState("Class 3")
+  const [mixRatio, setMixRatio] = useState(productToEdit?.metadata?.mix_ratio || "2:1 pu Thinner ratio")
+  const [particleSize, setParticleSize] = useState(productToEdit?.metadata?.particle_size || "15-78 UM Pearls")
+  const [hazmatClass, setHazmatClass] = useState(productToEdit?.metadata?.hazmat_class || "Class 3")
 
   // Guide notes
   const [testSampleNote, setTestSampleNote] = useState(
-    "Do a test sample for better understanding"
+    productToEdit?.metadata?.test_sample_note || "Do a test sample for better understanding"
   )
-  const [topCoatTitle, setTopCoatTitle] = useState("TOP COAT CLEAR")
+  const [topCoatTitle, setTopCoatTitle] = useState(
+    productToEdit?.metadata?.top_coat_title || "TOP COAT CLEAR"
+  )
   const [topCoatDesc, setTopCoatDesc] = useState(
-    "Finish with a UV protected clear coat (typically 2-3 coats). For best results, follow the coating manufacturer's recommended flash time in between coats, according to the temperature you are spraying in"
+    productToEdit?.metadata?.top_coat_desc ||
+      "Finish with a UV protected clear coat (typically 2-3 coats). For best results, follow the coating manufacturer's recommended flash time in between coats, according to the temperature you are spraying in"
   )
   const [pickupInfo, setPickupInfo] = useState(
-    "Pickup available at blackfx ground floor 33/547 - Usually ready in 24 hours"
+    productToEdit?.metadata?.pickup_info ||
+      "Pickup available at blackfx ground floor 33/547 - Usually ready in 24 hours"
   )
 
   // Pricing
@@ -185,67 +227,114 @@ export default function ColorForm({ onClose, onSuccess }: ColorFormProps) {
     setGalleryUrls((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const sanitizeUrl = (url?: string): string => {
+    if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+      return url
+    }
+    if (url && url.startsWith("data:") && url.length <= 6000) {
+      return url
+    }
+    // Generate unique SVG paint swatch graphic based on hex color and paint title
+    return generatePaintSvgDataUri(title || "Paint", hexColor, brand)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
     try {
-      const options = [
-        { title: "Size", values: SIZES },
-        { title: "Finish", values: FINISHES },
-      ]
-
-      const formattedVariants = variants.map((v) => ({
-        title: `${v.size} / ${v.finish}`,
-        options: {
-          Size: v.size,
-          Finish: v.finish,
-        },
-        prices: [
-          {
-            currency_code: "inr",
-            amount: Math.round(parseFloat(v.price) * 100),
-          },
-        ],
-        manage_inventory: false,
-      }))
-
-
-      // Prepare images list
-      const allImageUrls = [coverImageUrl, ...galleryUrls].filter(Boolean)
+      const cleanCoverUrl = sanitizeUrl(coverImageUrl)
+      const cleanGalleryUrls = galleryUrls.map((u) => sanitizeUrl(u)).filter(Boolean) as string[]
+      const allImageUrls = [cleanCoverUrl, ...cleanGalleryUrls].filter(Boolean) as string[]
       const imagesPayload = allImageUrls.map((url) => ({ url }))
 
-      const payload = {
-        title,
-        handle,
-        description,
-        status: "published",
-        thumbnail: coverImageUrl || undefined,
-        images: imagesPayload,
-        options,
-        variants: formattedVariants,
-        categories: selectedCategory ? [{ id: selectedCategory }] : [],
-        metadata: {
+      if (isEditing && productToEdit?.id) {
+        const updatePayload = {
+          title,
+          handle,
+          description,
+          thumbnail: cleanCoverUrl,
+          images: imagesPayload,
+          categories: selectedCategory ? [{ id: selectedCategory }] : [],
+          metadata: {
+            brand,
+            color_hex: hexColor,
+            image_url: coverImageUrl, // Keep full data url in JSON metadata if needed
+            primary_base_color: primaryBaseColor,
+            mix_ratio: mixRatio,
+            particle_size: particleSize,
+            test_sample_note: testSampleNote,
+            top_coat_title: topCoatTitle,
+            top_coat_desc: topCoatDesc,
+            pickup_info: pickupInfo,
+            hazmat_class: hazmatClass,
+          },
+        }
 
-          brand,
-          color_hex: hexColor,
-          image_url: coverImageUrl,
-          primary_base_color: primaryBaseColor,
-          mix_ratio: mixRatio,
-          particle_size: particleSize,
-          test_sample_note: testSampleNote,
-          top_coat_title: topCoatTitle,
-          top_coat_desc: topCoatDesc,
-          pickup_info: pickupInfo,
-          hazmat_class: hazmatClass,
-        },
+        await updateAdminProduct(productToEdit.id, updatePayload)
+      } else {
+        const options = [
+          { title: "Size", values: SIZES },
+          { title: "Finish", values: FINISHES },
+        ]
+
+        // Convert INR price to approximate EUR/USD for storefront visibility
+        // The storefront region uses EUR — products need EUR prices to appear
+        const inrToEurRate = 0.011 // approx 1 INR = 0.011 EUR
+        const inrToUsdRate = 0.012 // approx 1 INR = 0.012 USD
+
+        const formattedVariants = variants.map((v) => {
+          const inrAmount = Math.round(parseFloat(v.price) * 100)
+          const eurAmount = Math.round(parseFloat(v.price) * inrToEurRate * 100)
+          const usdAmount = Math.round(parseFloat(v.price) * inrToUsdRate * 100)
+
+          return {
+            title: `${v.size} / ${v.finish}`,
+            options: {
+              Size: v.size,
+              Finish: v.finish,
+            },
+            prices: [
+              { currency_code: "inr", amount: inrAmount },
+              { currency_code: "eur", amount: eurAmount },
+              { currency_code: "usd", amount: usdAmount },
+            ],
+            manage_inventory: false,
+          }
+        })
+
+        const createPayload = {
+          title,
+          handle,
+          description,
+          status: "published",
+          thumbnail: cleanCoverUrl,
+          images: imagesPayload,
+          options,
+          variants: formattedVariants,
+          categories: selectedCategory ? [{ id: selectedCategory }] : [],
+          metadata: {
+            brand,
+            color_hex: hexColor,
+            image_url: coverImageUrl, // Keep full data url in JSON metadata if needed
+            primary_base_color: primaryBaseColor,
+            mix_ratio: mixRatio,
+            particle_size: particleSize,
+            test_sample_note: testSampleNote,
+            top_coat_title: topCoatTitle,
+            top_coat_desc: topCoatDesc,
+            pickup_info: pickupInfo,
+            hazmat_class: hazmatClass,
+          },
+        }
+
+        await createAdminProduct(createPayload)
       }
 
-      await createAdminProduct(payload)
       onSuccess()
     } catch (err: any) {
-      setError(err?.message || "Failed to create product. Check backend logs.")
+      setError(err?.message || "Failed to save product. Check backend logs.")
     } finally {
       setLoading(false)
     }
@@ -258,10 +347,10 @@ export default function ColorForm({ onClose, onSuccess }: ColorFormProps) {
         <div className="px-6 py-4 border-b border-black bg-neutral-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-mono text-xs bg-white text-black px-2 py-0.5 font-bold uppercase tracking-widest">
-              NEW PAINT
+              {isEditing ? "EDIT PAINT" : "NEW PAINT"}
             </span>
             <h2 className="text-sm font-mono uppercase tracking-wider font-bold">
-              Automotive Color Creator
+              {isEditing ? `Edit ${title || "Paint Product"}` : "Create Automotive Custom Paint Product"}
             </h2>
           </div>
           <button

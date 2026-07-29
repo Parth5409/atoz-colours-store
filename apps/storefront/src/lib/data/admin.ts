@@ -2,7 +2,122 @@
 
 import { sdk } from "@lib/config"
 import { cookies as nextCookies } from "next/headers"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, revalidatePath } from "next/cache"
+
+// Retrieve sales channels using admin authorization
+export async function retrieveAdminSalesChannels() {
+  const headers = await getAdminAuthHeaders()
+  if (!headers.authorization) return []
+  try {
+    const response = await sdk.client.fetch<{ sales_channels: any[] }>("/admin/sales-channels", {
+      method: "GET",
+      headers,
+    })
+    return response?.sales_channels || []
+  } catch (error) {
+    console.warn("Failed to retrieve sales channels:", error)
+    return []
+  }
+}
+
+// Create a new paint product/color
+export async function createAdminProduct(payload: any) {
+  const headers = await getAdminAuthHeaders()
+  if (!headers.authorization) {
+    throw new Error("Unauthorized: Please log in as store admin.")
+  }
+
+  try {
+    const salesChannels = await retrieveAdminSalesChannels()
+    if (!payload.sales_channels && salesChannels.length > 0) {
+      payload.sales_channels = salesChannels.map((sc: any) => ({ id: sc.id }))
+    }
+
+    const response = await sdk.client.fetch<any>("/admin/products", {
+      method: "POST",
+      headers,
+      body: payload,
+    })
+
+    const createdProduct = response?.product
+    if (createdProduct?.id && salesChannels.length > 0) {
+      try {
+        await sdk.client.fetch<any>(`/admin/products/${createdProduct.id}/sales-channels`, {
+          method: "POST",
+          headers,
+          body: { add: salesChannels.map((sc: any) => sc.id) },
+        })
+      } catch (scErr) {
+        console.warn("Sales channel explicit bind warning:", scErr)
+      }
+    }
+
+    try {
+      revalidateTag("products")
+      revalidatePath("/", "layout")
+    } catch (e) {
+      // Ignore revalidate context errors if called client side
+    }
+
+    return createdProduct
+  } catch (error: any) {
+    console.error("Failed to create admin product:", error)
+    throw new Error(error?.message || "Failed to create product")
+  }
+}
+
+// Update an existing paint product
+export async function updateAdminProduct(productId: string, payload: any) {
+  const headers = await getAdminAuthHeaders()
+  if (!headers.authorization) {
+    throw new Error("Unauthorized: Please log in as store admin.")
+  }
+
+  try {
+    const response = await sdk.client.fetch<any>(`/admin/products/${productId}`, {
+      method: "POST",
+      headers,
+      body: payload,
+    })
+
+    try {
+      revalidateTag("products")
+      revalidatePath("/", "layout")
+    } catch (e) {
+      // Ignore revalidate context errors if called client side
+    }
+
+    return response.product
+  } catch (error: any) {
+    console.error("Failed to update admin product:", error)
+    throw new Error(error?.message || "Failed to update product")
+  }
+}
+
+// Delete an admin product
+export async function deleteAdminProduct(productId: string) {
+  const headers = await getAdminAuthHeaders()
+  if (!headers.authorization) {
+    throw new Error("Unauthorized: Please log in as store admin.")
+  }
+
+  try {
+    await sdk.client.fetch<any>(`/admin/products/${productId}`, {
+      method: "DELETE",
+      headers,
+    })
+
+    try {
+      revalidateTag("products")
+      revalidatePath("/", "layout")
+    } catch (e) {
+      // Ignore revalidate context errors if called client side
+    }
+  } catch (error: any) {
+    console.error("Failed to delete admin product:", error)
+    throw new Error(error?.message || "Failed to delete product")
+  }
+}
 import { redirect } from "next/navigation"
 
 // Helper to get admin authorization headers
@@ -114,46 +229,6 @@ export async function retrieveAdminProducts() {
   }
 }
 
-// Create a new paint product/color
-export async function createAdminProduct(payload: any) {
-  const headers = await getAdminAuthHeaders()
-  if (!headers.authorization) {
-    throw new Error("Unauthorized: Please log in as store admin.")
-  }
-
-  try {
-    const response = await sdk.client.fetch<any>("/admin/products", {
-      method: "POST",
-      headers,
-      body: payload,
-    })
-
-    revalidateTag("products")
-    return response.product
-  } catch (error: any) {
-    console.error("Failed to create admin product:", error)
-    throw new Error(error?.message || "Failed to create product")
-  }
-}
-
-// Delete an admin product
-export async function deleteAdminProduct(productId: string) {
-  const headers = await getAdminAuthHeaders()
-  if (!headers.authorization) {
-    throw new Error("Unauthorized: Please log in as store admin.")
-  }
-
-  try {
-    await sdk.client.fetch<any>(`/admin/products/${productId}`, {
-      method: "DELETE",
-      headers,
-    })
-    revalidateTag("products")
-  } catch (error: any) {
-    console.error("Failed to delete admin product:", error)
-    throw new Error(error?.message || "Failed to delete product")
-  }
-}
 
 // Retrieve categories using admin privilege (with store fallback)
 export async function retrieveAdminCategories() {

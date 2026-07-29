@@ -16,11 +16,12 @@ export const metadata: Metadata = {
 export default async function Home(props: {
   params: Promise<{ countryCode: string }>
 }) {
+  const { countryCode } = await props.params
   return (
     <>
       <Categories />
       <Hero />
-      <FeaturedProducts />
+      <FeaturedProducts countryCode={countryCode} />
       <WhyChooseUs />
       <FeaturedBlogs />
       <Faq />

@@ -11,6 +11,7 @@ export default function AdminDashboardPage() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<any | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("")
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid")
@@ -346,6 +347,12 @@ export default function AdminDashboardPage() {
                         </span>
 
                         <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setEditingProduct(p)}
+                            className="text-[11px] uppercase font-mono font-bold text-neutral-900 hover:text-blue-600 underline"
+                          >
+                            Edit
+                          </button>
                           <LocalizedClientLink
                             href={`/products/${p.handle}`}
                             target="_blank"
@@ -437,6 +444,12 @@ export default function AdminDashboardPage() {
                         </td>
 
                         <td className="p-4 text-right space-x-3">
+                          <button
+                            onClick={() => setEditingProduct(p)}
+                            className="text-xs uppercase font-mono font-bold text-neutral-900 hover:text-blue-600 underline"
+                          >
+                            Edit
+                          </button>
                           <LocalizedClientLink
                             href={`/products/${p.handle}`}
                             target="_blank"
@@ -461,12 +474,17 @@ export default function AdminDashboardPage() {
         </main>
       </div>
 
-      {/* Color Creator Modal */}
-      {showAddForm && (
+      {/* Color Creator / Editor Modal */}
+      {(showAddForm || editingProduct) && (
         <ColorForm
-          onClose={() => setShowAddForm(false)}
+          productToEdit={editingProduct}
+          onClose={() => {
+            setShowAddForm(false)
+            setEditingProduct(null)
+          }}
           onSuccess={() => {
             setShowAddForm(false)
+            setEditingProduct(null)
             loadData()
           }}
         />

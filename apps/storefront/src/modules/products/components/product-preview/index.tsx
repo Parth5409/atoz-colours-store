@@ -45,20 +45,20 @@ export default async function ProductPreview({
           </div>
           
           {/* Swatch & Paint metadata properties */}
-          {(product.metadata?.color_hex || product.metadata?.mix_ratio) && (
+          {(Boolean(product.metadata?.color_hex) || Boolean(product.metadata?.mix_ratio)) && (
             <div className="flex items-center gap-x-2 mt-1">
-              {product.metadata?.color_hex && (
+              {product.metadata?.color_hex ? (
                 <div 
                   className="w-4 h-4 border border-neutral-300 rounded-none shadow-none" 
-                  style={{ backgroundColor: product.metadata.color_hex as string }}
-                  title={`Color: ${product.metadata.color_hex}`}
+                  style={{ backgroundColor: String(product.metadata.color_hex) }}
+                  title={`Color: ${String(product.metadata.color_hex)}`}
                 />
-              )}
-              {product.metadata?.mix_ratio && (
+              ) : null}
+              {product.metadata?.mix_ratio ? (
                 <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-widest">
-                  Mix: {product.metadata.mix_ratio as string}
+                  Mix: {String(product.metadata.mix_ratio)}
                 </span>
-              )}
+              ) : null}
             </div>
           )}
         </div>
